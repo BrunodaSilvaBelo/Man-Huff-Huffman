@@ -27,16 +27,9 @@ TEST_CASE( "Reader tests", "[read]") {
     auto freq = read(arquivo);
     decltype(freq) hell {
         {'\x02', 1},
-            {'a', 2},
-                {'b', 2},
-                    {'c', 1}
+        {'a', 2},
+        {'b', 2},
+        {'c', 1}
     };
-    for (auto a: freq) {
-        cerr << a.first << " = " << a.second << endl;
-    }
-    cerr << "---" << endl;
-    for (auto a: hell) {
-        cerr << a.first << " = " << a.second << endl;
-    }
     REQUIRE(freq == hell);
 }
