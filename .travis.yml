@@ -5,13 +5,13 @@ compiler:
   - gcc
 
 env:
-  -BUILD_TYPE=Debug
-  -BUILD_TYPE=Release
-
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
+  
 install:
   - mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../
   - make
 
 script:
-  -./manhuffhuffmantest
+  - ./manhuffhuffmantest
