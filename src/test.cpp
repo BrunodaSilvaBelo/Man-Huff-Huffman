@@ -8,15 +8,16 @@
 
 using namespace std;
 
-void ooohyeahhh(){
-}
-
 TEST_CASE( "Reader tests", "[read]") {
-    ooohyeahhh();
+    REQUIRE_THROWS(read("NoExiste"));
     {
         ofstream stream(arquivo);
         if ((stream.rdstate() & ios_base::failbit))
             throw runtime_error("[TEST] Cannot create the file!");
+
+        //REQUIRE_NOTHROW(read(arquivo));
+        //map<uint8_t, unsigned int> empty;
+        //REQUIRE(read(arquivo) == empty);
 
         char buffer[] = { '\x02', 'a', 'b', 'a', 'c', 'b' };
         stream.write(buffer, sizeof(buffer));
