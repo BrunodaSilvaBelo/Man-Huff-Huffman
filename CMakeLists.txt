@@ -33,3 +33,6 @@ add_executable( "${PROJECT_NAME}test" src/test.cpp )
 
 target_link_libraries( "${PROJECT_NAME}code" ${LIB_NAME} )
 target_link_libraries( "${PROJECT_NAME}test" ${LIB_NAME} )
+
+enable_testing()
+add_test(NAME RunTests COMMAND "${PROJECT_NAME}test")
