@@ -5,6 +5,7 @@ compiler:
 
 env:
   - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
 
 install:
   - mkdir build && cd build
