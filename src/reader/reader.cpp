@@ -8,13 +8,13 @@ using namespace std;
 
 template<class T, class CharT = char, class Traits = char_traits<CharT>,
          class Distance = ptrdiff_t >
-struct theresnoescapefromthisiterator
+struct readeriterator
     : public iterator<input_iterator_tag, T, Distance, const T*, const T&>
 {
 public:
-    theresnoescapefromthisiterator() = default;
+    readeriterator() = default;
 
-    theresnoescapefromthisiterator(basic_istream<CharT, Traits> &stream) :
+    readeriterator(basic_istream<CharT, Traits> &stream) :
         stream(&stream)
     {
         stream.seekg(0, ios_base::end);
@@ -25,7 +25,7 @@ public:
             this->stream = NULL;
     }
 
-    theresnoescapefromthisiterator &operator++()
+    readeriterator &operator++()
     {
         assert(stream);
         pos += 1;
@@ -36,13 +36,13 @@ public:
         return *this;
     }
 
-    bool operator==(const theresnoescapefromthisiterator &rhs)
+    bool operator==(const readeriterator &rhs)
     {
         return (stream && rhs.stream) ? (pos == rhs.pos)
             : (stream == rhs.stream);
     }
 
-    bool operator!=(const theresnoescapefromthisiterator &rhs)
+    bool operator!=(const readeriterator &rhs)
     {
         return !(*this == rhs);
     }
@@ -76,21 +76,21 @@ private:
 class Reader {
 public:
     Reader(istream &stream);
-    theresnoescapefromthisiterator<uint8_t> begin();
-    theresnoescapefromthisiterator<uint8_t> end();
+    readeriterator<uint8_t> begin();
+    readeriterator<uint8_t> end();
 private:
-    theresnoescapefromthisiterator<uint8_t> begin_;
+    readeriterator<uint8_t> begin_;
 };
 
 Reader::Reader(istream &stream)
     : begin_(stream) {
 }
 
-theresnoescapefromthisiterator<uint8_t> Reader::begin() {
+readeriterator<uint8_t> Reader::begin() {
     return begin_;
 }
 
-theresnoescapefromthisiterator<uint8_t> Reader::end() {
+readeriterator<uint8_t> Reader::end() {
     return {};
 }
 
