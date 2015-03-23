@@ -10,7 +10,7 @@ env:
 
 install:
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../
   - make
 
 script:
