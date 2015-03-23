@@ -19,7 +19,10 @@ public:
     {
         stream.seekg(0, ios_base::end);
         file_size = stream.tellg();
-        fill();
+        if (file_size)
+            fill();
+        else
+            stream = NULL;
     }
 
     theresnoescapefromthisiterator &operator++()
