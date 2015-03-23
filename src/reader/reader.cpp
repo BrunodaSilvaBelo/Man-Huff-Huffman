@@ -22,7 +22,7 @@ public:
         if (file_size)
             fill();
         else
-            stream = NULL;
+            this->stream = NULL;
     }
 
     theresnoescapefromthisiterator &operator++()
