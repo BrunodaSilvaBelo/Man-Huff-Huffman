@@ -2,10 +2,17 @@ language: cpp
 
 compiler:
   - clang
+  - gcc
 
 env:
   - BUILD_TYPE=Debug
   - BUILD_TYPE=Release
+
+  before_install:
+    - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
+    - if [ "$CXX" = "g++" ]; then sudo apt-get update -qq; fi
+    - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
 install:
   - mkdir build && cd build
@@ -13,4 +20,4 @@ install:
   - make
 
 script:
-  - ctest
+  - ctest -V
