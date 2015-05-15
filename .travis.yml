@@ -13,8 +13,10 @@ before_install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get update -qq; fi
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.9; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - sudo apt-get install libboost-all-dev
 
 install:
+  - cmake --version
   - mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../
   - make
