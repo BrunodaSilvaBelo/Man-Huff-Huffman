@@ -3,10 +3,12 @@
 #include <stdexcept>
 #include "catch.hpp"
 #include "reader/reader.h"
+#include "coder/coder.h"
 
 #define arquivo "arquivo"
 
 using namespace std;
+using boost::dynamic_bitset;
 
 TEST_CASE( "Reader tests", "[read]") {
     SECTION("Trying to read a no existent file")
@@ -38,4 +40,31 @@ TEST_CASE( "Reader tests", "[read]") {
         };
         REQUIRE(freq == hell);
     }
+}
+
+TEST_CASE("Coder test case", "[coder]") {
+    map<uint8_t, unsigned int> frequency {
+        {'m', 1},
+            {'i', 5},
+                {'s', 4},
+                    {'p', 2},
+                        {'r', 2},
+                            {'v', 1},
+                                {'e', 1},
+                                    {'\x20', 1}
+    };
+
+    auto ret = codetable(frequency);
+    decltype(ret) correct {
+        {'i', dynamic_bitset<>{2, 0x3}},
+            {'s', dynamic_bitset<>{2, 0x0}},
+                {'p', dynamic_bitset<>{3, 0x2}},
+                    {'r', dynamic_bitset<>{3, 0x6}},
+                        {'m', dynamic_bitset<>{4, 0x5}},
+                            {'v', dynamic_bitset<>{4, 0xd}},
+                                {'e', dynamic_bitset<>{4, 0x9}},
+                                    {'\x20', dynamic_bitset<>{4, 0x1}}
+    };
+    
+    REQUIRE(ret == correct);
 }

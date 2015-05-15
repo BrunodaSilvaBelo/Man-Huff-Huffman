@@ -18,15 +18,40 @@ void treewalker(map<uint8_t, dynamic_bitset<>> &out, shared_ptr<node> node,
     treewalker(out, node->rightnode, bits);
 }
 
+#if 0
+void printTree(shared_ptr<node> node, unsigned ident = 0) {
+    if (node->leftnode == NULL) {
+        auto prefix = string(ident * 2, ' ');
+        cout << prefix << string(node->children.begin(), node->children.end())
+             << " " << node->frequency << endl;
+        return;
+    }
+
+    auto prefix = string(ident * 2, ' ');
+    cout << prefix << string(node->children.begin(), node->children.end())
+         << " " << node->frequency << endl;
+    printTree(node->leftnode, ident + 1);
+    printTree(node->rightnode, ident + 1);
+}
+#endif
+
 map<uint8_t, dynamic_bitset<>> codetable(map<uint8_t, unsigned int> frequency) {
     vector<shared_ptr<node>> nodes;
+
+    auto sortedinsert = [&nodes](shared_ptr<node> n){
+        nodes.insert(upper_bound(nodes.begin(), nodes.end(), n,
+                                 [](decltype(n) lhs, decltype(n) rhs)
+                                 {
+                                     return lhs->frequency < rhs->frequency;
+                                 }), n);
+    };
 
     for (auto f : frequency) {
         auto n = make_shared<node>();
         n->frequency = f.second;
         n->children.push_back(f.first);
 
-        nodes.push_back(n);
+        sortedinsert(n);
     }
 
     while (nodes.size() != 1) {
@@ -46,11 +71,7 @@ map<uint8_t, dynamic_bitset<>> codetable(map<uint8_t, unsigned int> frequency) {
         n->children.insert(n->children.begin(),
                            j->children.begin(), j->children.end());
 
-        nodes.insert(upper_bound(nodes.begin(), nodes.end(), n,
-                                 [](decltype(n) lhs, decltype(n) rhs)
-                                 {
-                                     return lhs->frequency < rhs->frequency;
-                                 }), n);
+        sortedinsert(n);
     }
 
     map<uint8_t, dynamic_bitset<>> map;
