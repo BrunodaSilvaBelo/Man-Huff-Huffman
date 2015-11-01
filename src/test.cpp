@@ -1,8 +1,10 @@
 #define CATCH_CONFIG_MAIN
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 #include "catch.hpp"
 #include "io/reader.h"
+#include "io/writer.h"
 #include "coder/coder.h"
 
 #define arquivo "arquivo"
@@ -74,4 +76,23 @@ TEST_CASE("Coder test case", "[coder]") {
     REQUIRE(ret.at('v').size() == correct.at('v').size());
     REQUIRE(ret.at('e').size() == correct.at('e').size());
     REQUIRE(ret.at('\x20').size() == correct.at('\x20').size());
+}
+
+TEST_CASE( "Writer tests", "[write]") {
+    SECTION("Simplest writer of all")
+    {
+        ostringstream stream;
+        table_t table{
+            {'a', dynamic_bitset<>{9, 0x1280 >> 7}}
+        };
+        write_header(stream, table);
+        auto out = stream.str();
+        REQUIRE(out.size() == 6);
+
+        REQUIRE(out.at(0) == 'a');
+        REQUIRE(out.at(1) == '\x09');
+        REQUIRE(out.at(2) == '\x12');
+        REQUIRE(out.at(3) == '\x80');
+        REQUIRE(out.at(5) == '\x00');
+    }
 }
