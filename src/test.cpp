@@ -2,7 +2,7 @@
 #include <fstream>
 #include <stdexcept>
 #include "catch.hpp"
-#include "reader/reader.h"
+#include "io/reader.h"
 #include "coder/coder.h"
 
 #define arquivo "arquivo"
