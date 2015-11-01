@@ -20,7 +20,7 @@ set( LIB_NAME ${PROJECT_NAME} )
 set(LIBRARY_TYPE STATIC)
 
 set( SOURCE ${SOURCE}
-  "${PROJECT_SOURCE_DIR}/src/reader/reader.cpp"
+  "${PROJECT_SOURCE_DIR}/src/io/reader.cpp"
   "${PROJECT_SOURCE_DIR}/src/coder/coder.cpp"
   )
 
