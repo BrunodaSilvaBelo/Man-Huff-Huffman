@@ -96,3 +96,14 @@ TEST_CASE( "Writer tests", "[write]") {
         REQUIRE(out.at(5) == '\x00');
     }
 }
+
+TEST_CASE("Reader header tests", "[read]") {
+    stringstream ss;
+    ss.str("a\x09\x12\x80\x00\x00");
+    table_t table {
+        {'a', dynamic_bitset<>{9, 0x1280 >> 7}}};
+
+    auto ret = read_header(ss);
+
+    REQUIRE(ret == table);
+}
