@@ -1,4 +1,5 @@
 language: cpp
+sudo: false
 
 compiler:
   - clang
@@ -15,7 +16,7 @@ addons:
     packages:
       - cmake
       - libboost-all-dev
-      - g++-4.9
+      - g++-5
 
 before_install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
