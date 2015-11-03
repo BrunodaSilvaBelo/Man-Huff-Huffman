@@ -80,30 +80,52 @@ TEST_CASE("Coder test case", "[coder]") {
 
 TEST_CASE( "Writer tests", "[write]") {
     SECTION("Simplest writer of all")
-    {
-        ostringstream stream;
-        table_t table{
-            {'a', dynamic_bitset<>{9, 0x1280 >> 7}}
-        };
-        write_header(stream, table);
-        auto out = stream.str();
-        REQUIRE(out.size() == 6);
+        {
+            ostringstream stream;
+            table_t table{
+                {'a', dynamic_bitset<>{9, 0x1280 >> 7}}
+            };
+            write_header(stream, table);
+            auto out = stream.str();
+            REQUIRE(out.size() == 6);
 
-        REQUIRE(out.at(0) == 'a');
-        REQUIRE(out.at(1) == '\x09');
-        REQUIRE(out.at(2) == '\x12');
-        REQUIRE(out.at(3) == '\x80');
-        REQUIRE(out.at(5) == '\x00');
-    }
+            REQUIRE(out.at(0) == 'a');
+            REQUIRE(out.at(1) == '\x09');
+            REQUIRE(out.at(2) == '\x12');
+            REQUIRE(out.at(3) == '\x80');
+            REQUIRE(out.at(5) == '\x00');
+        }
 }
 
 TEST_CASE("Reader header tests", "[read]") {
     stringstream ss;
-    ss.str("a\x09\x12\x80\x00\x00");
-    table_t table {
-        {'a', dynamic_bitset<>{9, 0x1280 >> 7}}};
+    SECTION("Table with no character") {
+        ss.str("a\x00");
 
-    auto ret = read_header(ss);
+        table_t table;
+        auto ret = read_header(ss);
 
-    REQUIRE(ret == table);
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with a character") {
+        ss.str("a\x09\x12\x80\x00\x00");
+
+        table_t table {
+            {'a', dynamic_bitset<>{9, 0x1280 >> 7}}
+        };
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with 2 character, one with 6 bits, and another with 9 bits") {
+        ss.str("a\x09\x12\x80\xb\x06\x2f\x00\x00");
+
+        table_t table {
+            {'a', dynamic_bitset<>{9, 0x1280 >> 7}},
+                {'\xb', dynamic_bitset<>{6, 0x2f >> 7}}
+        };
+            auto ret = read_header(ss);
+
+            REQUIRE(ret == table);
+    }
 }
