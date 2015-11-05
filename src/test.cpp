@@ -83,7 +83,7 @@ TEST_CASE( "Writer tests", "[write]") {
         {
             ostringstream stream;
             table_t table{
-                {'a', dynamic_bitset<>{9, 0x1280 >> 7}}
+                {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}}
             };
             write_header(stream, table);
             auto out = stream.str();
@@ -108,24 +108,54 @@ TEST_CASE("Reader header tests", "[read]") {
         REQUIRE(ret == table);
     }
     SECTION("Table with a character") {
-        ss.str("a\x09\x12\x80\x00\x00");
+        ss.str("a\x09\x12\x80\x0b\x00");
 
         table_t table {
-            {'a', dynamic_bitset<>{9, 0x1280 >> 7}}
+            {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}}
         };
         auto ret = read_header(ss);
 
         REQUIRE(ret == table);
     }
     SECTION("Table with 2 character, one with 6 bits, and another with 9 bits") {
-        ss.str("a\x09\x12\x80\xb\x06\x2f\x00\x00");
+        ss.str("a\x09\x12\x80\x69\x06\x2f\x0d\x00");
 
         table_t table {
-            {'a', dynamic_bitset<>{9, 0x1280 >> 7}},
-                {'\xb', dynamic_bitset<>{6, 0x2f >> 7}}
+            {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}},
+                {'\x69', dynamic_bitset<>{6, 0x2f >> compense(6)}}
         };
             auto ret = read_header(ss);
 
             REQUIRE(ret == table);
+    }
+    SECTION("Table with 1 character with 8 bits") {
+        ss.str("a\x08\x07\x05\x00");
+        table_t table {
+            {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
+        };
+
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with 2 character, one with 8 bits, other with 16 bit") {
+        ss.str("a\x08\x07\x05\x75\x10\x1f\xff\x04\x00");
+        table_t table {
+            {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
+        };
+
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with 3 character, one with 8 bits, other with 16 bit and other with 1 bit") {
+        ss.str("a\x08\x07\x05\x75\x10\x1f\xff\x74\x01\x01\x04\x00");
+        table_t table {
+            {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
+        };
+
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
     }
 }

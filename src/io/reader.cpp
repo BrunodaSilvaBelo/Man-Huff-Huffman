@@ -123,7 +123,8 @@ table_t read_header(istream &stream) {
             if ((int) attr.at(1) == 0)
                 break;
         } else if (attr.size() >= 3) {
-            if ((attr.size() - 2) != 1 + (((unsigned long) attr.at(1)) / 8))
+            if ((attr.size() - 2) != (((unsigned long) attr.at(1)) / 8)
+                + ((unsigned long)(((int) attr.at(1)) % 8) ? 1 : 0))
                 continue;
             auto character = (uint8_t) attr.front();
             attr.pop_front();
@@ -140,7 +141,7 @@ table_t read_header(istream &stream) {
                     db.push_back((byte >> j) & 0x1);
             }
 
-            db = db >> 7;
+            db = db >> compense(size);
             db.resize(size);
             map.insert(make_pair(character, db));
         }
