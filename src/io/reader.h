@@ -6,6 +6,8 @@
 #include <string>
 #include "coder/coder.h"
 
+#define compense(size) (8 - (size % 8))
+
 std::map<uint8_t, unsigned int> read(std::string file);
 table_t read_header(std::istream &stream);
 #endif /* READER_H */
