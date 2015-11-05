@@ -78,7 +78,7 @@ TEST_CASE("Coder test case", "[coder]") {
     REQUIRE(ret.at('\x20').size() == correct.at('\x20').size());
 }
 
-TEST_CASE( "Writer tests", "[write]") {
+TEST_CASE( "Writer header tests", "[write]") {
     SECTION("Simplest writer of all")
         {
             ostringstream stream;
@@ -148,13 +148,30 @@ TEST_CASE("Reader header tests", "[read]") {
 
         REQUIRE(ret == table);
     }
-    SECTION("Table with 3 character, one with 8 bits, other with 16 bit and other with 1 bit") {
+    SECTION("Table with 3 character, one with 8 bits, other with 16 bit and"
+            " other with 1 bit") {
         ss.str("a\x08\x07\x05\x75\x10\x1f\xff\x74\x01\x01\x04\x00");
         table_t table {
             {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
         };
 
         auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+}
+
+TEST_CASE("Integration test for reader and writer", "[read][write]") {
+    SECTION("Table with 1 character with 9 bits"){
+        stringstream stream;
+
+        table_t table {
+            {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}}
+        };
+
+        write_header(stream, table);
+
+        auto ret = read_header(stream);
 
         REQUIRE(ret == table);
     }
