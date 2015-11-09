@@ -20,6 +20,10 @@ addons:
       - g++-5
       - clang++3.6
 
+before_install:
+  - clang++ --version
+  - g++ --version
+
 install:
   - cmake --version
   - mkdir build && cd build
