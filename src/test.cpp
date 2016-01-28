@@ -10,7 +10,7 @@
 using namespace std;
 using boost::dynamic_bitset;
 
-TEST_CASE( "Reader tests", "[read]") {
+TEST_CASE("Reader tests", "[read]") {
     SECTION("Trying to read a no existent file")
         REQUIRE_THROWS(read("NoExiste"));
     {
