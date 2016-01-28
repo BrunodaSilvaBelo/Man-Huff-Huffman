@@ -2,9 +2,12 @@
 #include <fstream>
 #include <stdexcept>
 #include <iterator>
+#include <deque>
+#include <utility>
 #include "reader.h"
 
 using namespace std;
+using boost::dynamic_bitset;
 
 template<class T, class CharT = char, class Traits = char_traits<CharT>,
          class Distance = ptrdiff_t >
@@ -97,7 +100,7 @@ readeriterator<uint8_t> Reader::end() {
 map<uint8_t, unsigned int> read(string file) {
     ifstream stream(file);
     if (stream.rdstate() & ios_base::failbit)
-        throw runtime_error("File do not exist");
+        throw runtime_error("File do not exist!");
 
     map<uint8_t, unsigned int> map;
 
@@ -106,5 +109,43 @@ map<uint8_t, unsigned int> read(string file) {
     }
 
     stream.close();
+    return map;
+}
+
+table_t read_header(istream &stream) {
+    table_t map;
+    char c;
+    deque<uint8_t> attr;
+    while (stream.get(c)) {
+        attr.push_back(c);
+
+        if (attr.size() == 2) {
+            if ((int) attr.at(1) == 0)
+                break;
+        } else if (attr.size() >= 3) {
+            if ((attr.size() - 2) != (((unsigned long) attr.at(1)) / 8)
+                + ((unsigned long)(((int) attr.at(1)) % 8) ? 1 : 0))
+                continue;
+            auto character = (uint8_t) attr.front();
+            attr.pop_front();
+            auto size = (int) attr.front();
+            attr.pop_front();
+
+            dynamic_bitset<> db;
+
+            for (int i = attr.size() - 1; i >= 0; --i) {
+                auto byte = attr.back();
+                attr.pop_back();
+
+                for (int j = 0; j < 8; ++j)
+                    db.push_back((byte >> j) & 0x1);
+            }
+
+            db = db >> compense(size);
+            db.resize(size);
+            map.insert(make_pair(character, db));
+        }
+    }
+
     return map;
 }

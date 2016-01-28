@@ -1,8 +1,10 @@
 #define CATCH_CONFIG_MAIN
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 #include "catch.hpp"
-#include "reader/reader.h"
+#include "io/reader.h"
+#include "io/writer.h"
 #include "coder/coder.h"
 
 #define arquivo "arquivo"
@@ -74,4 +76,103 @@ TEST_CASE("Coder test case", "[coder]") {
     REQUIRE(ret.at('v').size() == correct.at('v').size());
     REQUIRE(ret.at('e').size() == correct.at('e').size());
     REQUIRE(ret.at('\x20').size() == correct.at('\x20').size());
+}
+
+TEST_CASE( "Writer header tests", "[write]") {
+    SECTION("Simplest writer of all")
+        {
+            ostringstream stream;
+            table_t table{
+                {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}}
+            };
+            write_header(stream, table);
+            auto out = stream.str();
+            REQUIRE(out.size() == 6);
+
+            REQUIRE(out.at(0) == 'a');
+            REQUIRE(out.at(1) == '\x09');
+            REQUIRE(out.at(2) == '\x12');
+            REQUIRE(out.at(3) == '\x80');
+            REQUIRE(out.at(5) == '\x00');
+        }
+}
+
+TEST_CASE("Reader header tests", "[read]") {
+    stringstream ss;
+    SECTION("Table with no character") {
+        ss.str("a\x00");
+
+        table_t table;
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with a character") {
+        ss.str("a\x09\x12\x80\x0b\x00");
+
+        table_t table {
+            {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}}
+        };
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with 2 character, one with 6 bits, and another with 9 bits") {
+        ss.str("a\x09\x12\x80\x69\x06\x2f\x0d\x00");
+
+        table_t table {
+            {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}},
+                {'\x69', dynamic_bitset<>{6, 0x2f >> compense(6)}}
+        };
+            auto ret = read_header(ss);
+
+            REQUIRE(ret == table);
+    }
+    SECTION("Table with 1 character with 8 bits") {
+        ss.str("a\x08\x07\x05\x00");
+        table_t table {
+            {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
+        };
+
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with 2 character, one with 8 bits, other with 16 bit") {
+        ss.str("a\x08\x07\x05\x75\x10\x1f\xff\x04\x00");
+        table_t table {
+            {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
+        };
+
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+    SECTION("Table with 3 character, one with 8 bits, other with 16 bit and"
+            " other with 1 bit") {
+        ss.str("a\x08\x07\x05\x75\x10\x1f\xff\x74\x01\x01\x04\x00");
+        table_t table {
+            {'a', dynamic_bitset<>{8, 0x7 >> compense(8)}}
+        };
+
+        auto ret = read_header(ss);
+
+        REQUIRE(ret == table);
+    }
+}
+
+TEST_CASE("Integration test for reader and writer", "[read][write]") {
+    SECTION("Table with 1 character with 9 bits"){
+        stringstream stream;
+
+        table_t table {
+            {'a', dynamic_bitset<>{9, 0x1280 >> compense(9)}}
+        };
+
+        write_header(stream, table);
+
+        auto ret = read_header(stream);
+
+        REQUIRE(ret == table);
+    }
 }
