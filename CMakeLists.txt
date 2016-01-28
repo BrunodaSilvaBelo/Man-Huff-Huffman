@@ -34,7 +34,7 @@ add_library ( ${LIB_NAME}
 
 target_link_libraries( ${LIB_NAME} ${Boost_LIBRARIES} )
 add_executable( "${PROJECT_NAME}code" src/main.cpp )
-add_executable( "${PROJECT_NAME}test" src/test.cpp )
+add_executable( "${PROJECT_NAME}test" src/test.cpp ${SOURCE} )
 
 
 target_link_libraries( "${PROJECT_NAME}code" ${LIB_NAME} ${Boost_LIBRARIES} )
